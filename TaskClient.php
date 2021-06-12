@@ -2,6 +2,7 @@
 include_once "global.php";
 include_once "libs/mysql.php";
 include_once "libs/redis.php";
+include_once "domain/Response.php";
 
 /**
  * Class TaskClient
@@ -43,5 +44,17 @@ class TaskClient
         $redis = $this->getRedis();
         $keys = $this->config['redis']["keys"];
         $redis->lPush($keys, $task_class);
+    }
+
+    /**
+     * 执行
+     *
+     * @param \Swoole\Http\Request $req
+     * @param \Swoole\Http\Response $resp
+     */
+    public function execute(\Swoole\Http\Request $req, \Swoole\Http\Response $resp) {
+        $resp->header('Content-Type', 'application/json; charset=UTF-8');
+        $resp->header('cross-origin-resource-policy', 'cross-origin');
+        $resp->end(new Response("处理任务队列.............."));
     }
 }

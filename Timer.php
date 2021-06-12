@@ -2,6 +2,7 @@
 include_once "config.php";
 include_once "libs/mysql.php";
 include_once "libs/redis.php";
+include_once "domain/Response.php";
 
 /**
  * Class Timer
@@ -30,6 +31,18 @@ class Timer
     public function init()
     {
         //todo
+    }
+
+    /**
+     * 执行请求
+     *
+     * @param \Swoole\Http\Request $req
+     * @param \Swoole\Http\Response $resp
+     */
+    public function execute(\Swoole\Http\Request $req, \Swoole\Http\Response $resp) {
+        $resp->header('Content-Type', 'application/json; charset=UTF-8');
+        $resp->header('cross-origin-resource-policy', 'cross-origin');
+        $resp->end(new Response("处理定时器!!!!!!!!!!!"));
     }
 
     /**

@@ -19,7 +19,7 @@ class TimeServer
     private $taskClient;
     private $timer;
 
-    public function __construct($config)
+    public function __construct(array $config)
     {
         $this->config = $config;
         $this->initTable();
@@ -36,6 +36,8 @@ class TimeServer
         $table = new Swoole\Table(1024);
         $table->column('id', Swoole\Table::TYPE_INT);
         $table->column('time', Swoole\Table::TYPE_STRING, 64);
+        $table->column('name', Swoole\Table::TYPE_STRING, 256);
+        $table->column('task_type', Swoole\Table::TYPE_STRING, 64);
         $table->column('function', Swoole\Table::TYPE_STRING, 64);
         $table->create();
         $this->table = $table;
@@ -69,7 +71,9 @@ class TimeServer
         $this->startTimeProcess();
 
         //启动HTTP服务
-        $this->startHttpServer();
+        \Co\run(function () {
+            $this->startHttpServer();
+        });
 
         //回收所有进程
         Swoole\Process::wait();
@@ -101,18 +105,34 @@ class TimeServer
     private function startHttpServer()
     {
         $conf = $this->config['server'];
+        $host = $conf['host'];
+        $port = $conf['port'];
 
         //创建http服务协程 --------------------------
-        $http = new Swoole\Http\Server($conf['host'], $conf['port']);
+        $http = new Swoole\Coroutine\Http\Server($host, $port);
 
-        //接收请求
-        $http->on('Request', function ($request, $response) {
-            list($controller, $action) = explode('/', trim($request->server['request_uri'], '/'));
-            (new $controller)->$action($request, $response);
+        //处理定时器
+        $http->handle('/timer', function (\Swoole\Http\Request $req, \Swoole\Http\Response $resp) {
+            //调用timer处理
+            $this->getTimer()->execute($req, $resp);
         });
 
-        echo "启动HTTP服务 \n";
+        //处理任务队列
+        $http->handle('/tasker', function (\Swoole\Http\Request $req, \Swoole\Http\Response $resp) {
+            //调用taskClient处理
+            $this->getTaskClient()->execute($req, $resp);
+        });
+
+        echo "启动服务： $host:$port\n";
         $http->start();
+    }
+
+    private function getTaskClient() : TaskClient {
+        return $this->taskClient;
+    }
+
+    private function getTimer() : Timer {
+        return $this->timer;
     }
 }
 

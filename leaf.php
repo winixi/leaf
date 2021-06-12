@@ -12,7 +12,6 @@ include_once "config.php";
 $task_process = new swoole_process(function (swoole_process $task_process) use($config) {
     $taskServer = new TaskServer($config);
     $taskServer->start();
-    $task_process->exit(0);
 }, false, 0);
 $task_process->start();
 
@@ -20,7 +19,6 @@ $task_process->start();
 $time_process = new swoole_process(function (swoole_process $time_process) use($config) {
     $timeServer = new TimeServer($config);
     $timeServer->start();
-    $time_process->exec(0);
 }, false, 0);
 $time_process->start();
 
