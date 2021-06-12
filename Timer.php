@@ -23,6 +23,7 @@ class Timer
      */
     public function __construct($table) {
         $this->table = $table;
+        $this->init();
     }
 
     /**
@@ -30,6 +31,7 @@ class Timer
      */
     public function init()
     {
+        echo "初始化数据库中的时间表到内存...\n";
         //todo
     }
 
@@ -53,7 +55,7 @@ class Timer
     public function run($ticket_id)
     {
         $date = new DateTime();
-        echo "检查事件表: " . $date->getTimestamp() . "定时任务条数：" . $this->table->count() . "\n";
+//        echo "检查事件表: " . $date->getTimestamp() . "定时任务条数：" . $this->table->count() . "\n";
     }
 
     /**

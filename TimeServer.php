@@ -49,7 +49,6 @@ class TimeServer
     private function initTimer()
     {
         $timer = new Timer($this->table);
-        $timer->init();
         $this->timer = $timer;
     }
 

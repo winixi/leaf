@@ -9,7 +9,7 @@
  * @param $password
  * @return PDO
  */
-function getDbh($host, $port, $dbname, $username, $password)
+function getDbh($host, $port, $dbname, $username, $password): PDO
 {
     $dsn = 'mysql:host=' . $host . ';port=' . $port . ';dbname=' . $dbname;
     $dbh = new PDO($dsn, $username, $password);

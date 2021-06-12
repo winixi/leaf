@@ -7,9 +7,9 @@ abstract class Tasker {
     /**
      * 任务实现接口
      *
-     * @return mixed
+     * @return string
      */
-    abstract function run();
+    abstract function run(): string;
     function after(){}
     function status(){}
 }

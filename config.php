@@ -28,5 +28,6 @@ $config['redis']['keys'] = 'task_queue';
 #mysql
 $config['mysql']['host'] = "127.0.0.1";
 $config['mysql']['port'] = 3306;
-$config['mysql']['db_name'] = "leaf";
+$config['mysql']['dbname'] = "leaf";
+$config['mysql']['username'] = "leaf";
 $config['mysql']['password'] = "QC7BxCw0LejQzuI7";

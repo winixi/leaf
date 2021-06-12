@@ -106,7 +106,7 @@ curl http://127.0.0.1:9502/tasker/list/{size}
 {"code":0,"msg":"success","data":[{}]}
 
 #新增一个执行的任务
-curl -d '{"fun_class":"MyTask"}' \n
+curl -d '{"name":"MyTask","task_type":"FUN"}' \
  -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/tasker
 #返回
 {"code":0,"msg":"success","data":"redis-key"}

@@ -30,9 +30,9 @@ SET time_zone = "+00:00";
 CREATE TABLE `s_task` (
   `id` int(11) NOT NULL COMMENT '自增',
   `name` varchar(256) COLLATE utf8mb4_bin NOT NULL COMMENT '名称，可能是一个url或一个class',
-  `start` float NOT NULL COMMENT '开始时间',
-  `end` float NOT NULL COMMENT '结束时间',
-  `duration` float NOT NULL COMMENT '耗时秒数',
+  `start` double NOT NULL COMMENT '开始时间',
+  `end` double NOT NULL COMMENT '结束时间',
+  `duration` double NOT NULL COMMENT '耗时秒数',
   `task_type` varchar(16) COLLATE utf8mb4_bin NOT NULL COMMENT '任务类型[FUN,URL]',
   `result` text COLLATE utf8mb4_bin NOT NULL COMMENT '执行结果',
   `create_time` datetime NOT NULL COMMENT '创建时间'
