@@ -3,6 +3,7 @@ include_once "global.php";
 include_once "libs/redis.php";
 include_once "libs/mysql.php";
 include_once "libs/tools.php";
+include_once "libs/Logger.php";
 
 /**
  * Class TaskerServer
@@ -11,15 +12,17 @@ include_once "libs/tools.php";
  */
 class TaskerServer
 {
-    //配置
+    /**
+     * @var array
+     */
     private $config;
 
     /**
      * TaskerServer constructor.
      *
-     * @param $config
+     * @param array $config
      */
-    public function __construct($config)
+    public function __construct(array $config)
     {
         $this->config = $config;
     }
@@ -78,7 +81,7 @@ class TaskerServer
     private function workStart($pool)
     {
         $pool->on("WorkerStart", function ($pool, $workerId) {
-            echo "Worker#{$workerId} is started\n";
+            Logger::info("Worker#{$workerId} is started");
             //队列中读取任务
             $redis = $this->getRedis();
             $dbh = $this->getDbh();
@@ -111,7 +114,7 @@ class TaskerServer
         $name = $task['name'];
         $className = $this->config['task']['class_path'] . "/" . $name . ".php";
         if (!file_exists($className)) {
-            echo "任务类文件不存在:$className \n";
+            Logger::error("任务类文件不存在:$className");
             return;
         }
         require_once $className;
@@ -159,7 +162,7 @@ class TaskerServer
         $ch = curl_init($url);
 
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, array("timestamp"=>microtime_float()));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, array("timestamp" => microtime_float()));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 
         $result = curl_exec($ch);
@@ -177,7 +180,7 @@ class TaskerServer
     private function workStop($pool)
     {
         $pool->on("WorkerStop", function ($pool, $workerId) {
-            echo "Worker#{$workerId} is stopped\n";
+            Logger::info("Worker#{$workerId} is stopped");
         });
     }
 

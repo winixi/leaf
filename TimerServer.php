@@ -3,6 +3,7 @@ include_once "global.php";
 include_once "libs/redis.php";
 include_once "libs/mysql.php";
 include_once "libs/Crontab.php";
+include_once "libs/Logger.php";
 
 /**
  * Class TimerServer
@@ -75,6 +76,7 @@ class TimerServer
             $this->table->set($id, $record);
             $this->timeIds[] = $id;
         }
+        Logger::info("从数据库中加载了" . sizeof($this->timeIds) . "条定时任务");
     }
 
     /**
@@ -119,8 +121,10 @@ class TimerServer
     private function addTask(array $time)
     {
         //加入到执行任务队列
-        $task = array('name' => $time['name'], 'task_type' => $time['task_type']);
-        $this->taskClient->addTask(json_encode($task, true));
+        $task = json_encode(array('name' => $time['name'], 'task_type' => $time['task_type']), true);
+        $this->taskClient->addTask($task);
+
+        Logger::info("添加一条执行任务:" . $task);
 
         //本地累计一次
         $dbh = $this->getDbh();

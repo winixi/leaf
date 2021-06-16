@@ -16,9 +16,9 @@ class Logger
      *
      * @param $message
      */
-    static function error($message)
+    public static function error($message)
     {
-        //todo
+        self::add("error", $message);
     }
 
     /**
@@ -26,9 +26,9 @@ class Logger
      *
      * @param $message
      */
-    static function info($message)
+    public static function info($message)
     {
-        //todo
+        self::add("info", $message);
     }
 
     /**
@@ -36,8 +36,36 @@ class Logger
      *
      * @param $message
      */
-    static function debug($message)
+    public static function debug($message)
     {
-        //todo
+        self::add("debug", $message);
+    }
+
+    /**
+     * @param string $type
+     * @param string $message
+     */
+    private static function add(string $type, string $message)
+    {
+        $date_time = new DateTime;        // 日志内容
+        $time = $date_time->format('H:i:s');
+        $log_file = self::getFile($type, $date_time);
+        $trace = array_slice(debug_backtrace(), -1, 1);
+        var_dump($trace);
+        $file = $trace[0]['file'];
+        $line = $trace[0]['line'];
+        $log_data = sprintf('%s [%s] %s:%s %s' . PHP_EOL, $time, strtoupper($type), $file, $line, $message);        // 写入日志文件
+        return file_put_contents($log_file, $log_data, FILE_APPEND);
+    }
+
+    /**
+     * @param string $type
+     * @param DateTime $dateTime
+     * @return string
+     */
+    private static function getFile(string $type, DateTime $dateTime)
+    {
+        $f_dateTime = $dateTime->format('Y-m-d');
+        return LOG_PATH . '/' . $f_dateTime . "." . $type . ".log";
     }
 }

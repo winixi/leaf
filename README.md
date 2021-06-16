@@ -197,6 +197,5 @@ ALTER TABLE `s_time`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT COMMENT '自增';
 ```
 
-# todo list  
-日志系统
+# todo list
 集成mvc框架

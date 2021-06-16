@@ -16,15 +16,12 @@ include_once "domain/Response.php";
 class TaskerClient
 {
 
-    //配置
     /* @var array */
     private $config;
 
-    //redis
     /* @var Redis */
     private $redis;
 
-    //mysql连接
     /* @var PDO */
     private $dbh;
 
