@@ -7,5 +7,5 @@ global $config;
 include_once "../config.php";
 
 #开启任务队列服务
-$taskServer = new TaskServer($config);
+$taskServer = new TaskerServer($config);
 $taskServer->start();

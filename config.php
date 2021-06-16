@@ -4,20 +4,16 @@
  */
 
 #日志
-$config['log']['path'] = "/Users/winixi/github/leaf/logs";
+$config['log']['path'] = "/Users/winixi/leaf/logs";
 $config['log']['debug'] = true;
 
 #开启服务
 $config['server']['host'] = "0.0.0.0";
 $config['server']['port'] = 9502;
 
-#WEB服务
-$config['web']['host'] = "0.0.0.0";
-$config['web']['port'] = 9501;
-
 #任务进程数
 $config['task']['worker_num'] = 3;
-$config['task']['class_path'] = "/Users/winixi/github/leaf/tasks";
+$config['task']['class_path'] = "/Users/winixi/leaf/tasks";
 
 #redis
 $config['redis']['host'] = "127.0.0.1";

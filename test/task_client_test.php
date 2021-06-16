@@ -3,7 +3,7 @@ include_once "../global.php";
 
 global $config;
 include_once "../config.php";
-$taskClient = new TaskClient($config);
+$taskClient = new TaskerClient($config);
 
 while (true) {
     $taskClient->addTask("MyTask");

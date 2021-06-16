@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- 主机： localhost
--- 生成日期： 2021-06-12 03:26:36
+-- 生成日期： 2021-06-13 06:58:18
 -- 服务器版本： 5.7.11
 -- PHP 版本： 7.4.20
 
@@ -37,8 +37,6 @@ CREATE TABLE `s_task` (
   `result` text COLLATE utf8mb4_bin NOT NULL COMMENT '执行结果',
   `create_time` datetime NOT NULL COMMENT '创建时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='任务执行结果表';
-
--- --------------------------------------------------------
 
 --
 -- 表的结构 `s_time`

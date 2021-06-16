@@ -5,7 +5,7 @@
  *
  * 任务执行对象
  */
-class myTask extends Tasker
+class myTask extends BaseTask
 {
 
     /**
@@ -17,7 +17,7 @@ class myTask extends Tasker
     {
         $id = mt_rand();
         echo "执行任务: pid=$id \n";
-        sleep(mt_rand(1, 10));
+        sleep(1);
         echo "-完成任务：pid=$id \n";
         return "success";
     }

@@ -16,10 +16,20 @@ function getDbh($host, $port, $dbname, $username, $password): PDO
     return $dbh;
 }
 
-/* 通过传递一个含有插入值的数组执行一条预处理语句 */
-//$calories = 150;
-//$colour = 'red';
-//$sth = $dbh->prepare('SELECT name, colour, calories
-//    FROM fruit
-//    WHERE calories < :calories AND colour = :colour');
-//$sth->execute(array(':calories' => $calories, ':colour' => $colour));
+/**
+ * 检查连接有效
+ *
+ * @param $dbh
+ * @return bool
+ */
+function pdo_ping($dbh): bool
+{
+    try {
+        $dbh->getAttribute(PDO::ATTR_SERVER_INFO);
+    } catch (PDOException $e) {
+        if (strpos($e->getMessage(), 'MySQL server has gone away') !== false) {
+            return false;
+        }
+    }
+    return true;
+}

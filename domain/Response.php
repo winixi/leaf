@@ -1,6 +1,5 @@
 <?php
-define('SUCCESS', 'success');
-
+define('SUCCESS', 'ok');
 /**
  * 返回对象
  *
@@ -8,10 +7,10 @@ define('SUCCESS', 'success');
  */
 class Response
 {
-    //代码：1成功，0失败
-    private $code = 1;
+    //代码：0成功，1失败
+    private $code = 0;
 
-    //消息："success","fail"
+    //消息："ok"
     private $msg = SUCCESS;
 
     //数据：泛型
@@ -22,9 +21,9 @@ class Response
         $this->data = $data;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
-        return json_encode(array("code" => $this->code, "msg" => $this->msg, "data" => $this->data));
+        return json_encode(array("code" => $this->code, "msg" => $this->msg, "data" => $this->data), JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -56,7 +55,7 @@ class Response
      */
     public function setMsg($msg)
     {
-        if ($msg != SUCCESS) $this->code = 0;
+        if ($msg != SUCCESS) $this->code = 1;
         $this->msg = $msg;
     }
 
@@ -75,6 +74,5 @@ class Response
     {
         $this->data = $data;
     }
-
 
 }
