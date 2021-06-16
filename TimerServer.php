@@ -6,7 +6,11 @@ include_once "libs/Crontab.php";
 include_once "libs/Logger.php";
 
 /**
+ * 定时器服务端
+ *
  * Class TimerServer
+ *
+ * @author winixi@qq.com
  */
 class TimerServer
 {

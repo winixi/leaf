@@ -5,9 +5,8 @@
  * 2021-06-10.info.log
  * 2021-06-10.debug.log
  *
- * @Auther winixi@qq.com
+ * @author winixi@qq.com
  */
-
 class Logger
 {
 
@@ -51,7 +50,6 @@ class Logger
         $time = $date_time->format('H:i:s');
         $log_file = self::getFile($type, $date_time);
         $trace = array_slice(debug_backtrace(), -1, 1);
-        var_dump($trace);
         $file = $trace[0]['file'];
         $line = $trace[0]['line'];
         $log_data = sprintf('%s [%s] %s:%s %s' . PHP_EOL, $time, strtoupper($type), $file, $line, $message);        // 写入日志文件

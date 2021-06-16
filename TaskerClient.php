@@ -6,10 +6,9 @@ include_once "libs/tools.php";
 include_once "domain/Response.php";
 
 /**
- * Class TaskerClient
+ * 任务处理器客户端
  *
- * @var $config array
- * @var $redis Redis
+ * Class TaskerClient
  *
  * @Auther winixi@qq.com
  */

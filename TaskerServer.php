@@ -6,6 +6,8 @@ include_once "libs/tools.php";
 include_once "libs/Logger.php";
 
 /**
+ * 任务处理器服务端
+ *
  * Class TaskerServer
  *
  * @Auther winixi@qq.com

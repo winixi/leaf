@@ -6,6 +6,8 @@ include_once "libs/tools.php";
 include_once "domain/Response.php";
 
 /**
+ * 定时器客户端
+ *
  * Class TimerClient
  *
  * @Auther winixi@qq.com

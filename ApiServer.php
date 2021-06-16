@@ -1,6 +1,6 @@
 <?php
 /**
- * 服务器
+ * 接口服务器
  *
  * @author winixi@qq.com
  */

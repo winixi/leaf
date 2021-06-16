@@ -1,12 +1,17 @@
 <?php
 
 /**
+ * 定时任务时间解析器
+ *
  * Class Crontab
+ *
+ * @author winixi@qq.com
  */
 class Crontab
 {
     /**
      * 判断某个时间点是否在 cron 规则之内
+     * 
      * @param $cron
      * @param $time
      * @return bool
@@ -14,9 +19,7 @@ class Crontab
     public static function parseCron($cron, $time): bool
     {
         $cronArray = self::getCronArray($cron);
-
         $now = explode(' ', date('s i G j n w', $time));
-
         foreach ($now as $key => $piece) {
             if (!in_array($piece, $cronArray[$key])) {
                 return false;
@@ -26,6 +29,8 @@ class Crontab
     }
 
     /**
+     * 获取数组
+     *
      * @param $cron
      * @return array
      */
