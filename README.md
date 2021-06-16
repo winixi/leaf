@@ -25,7 +25,7 @@ mysql: 5.7.11
 ```
 
 # 配置文件
-[config.php](https://git.weixin.qq.com/winixi/leaf/blob/master/config.php)
+[config.php](https://github.com/winixi/leaf/blob/dev/config.php)
 ```
 #日志
 $config['log']['path'] = "/Users/winixi/leaf/logs";
@@ -55,7 +55,7 @@ $config['mysql']['password'] = "QC7BxCw0LejQzuI7";
 ```
 
 # 启停项目
-[bin.sh](https://git.weixin.qq.com/winixi/leaf/blob/dev/bin.sh)
+[bin.sh](https://github.com/winixi/leaf/blob/dev/bin.sh)
 ```
 #开启
 ./bin.sh start
@@ -71,7 +71,7 @@ $config['mysql']['password'] = "QC7BxCw0LejQzuI7";
 ```
 
 # 发布程序到环境
-[deploy.sh](https://git.weixin.qq.com/winixi/leaf/blob/dev/deploy.sh)
+[deploy.sh](https://github.com/winixi/leaf/blob/dev/deploy.sh)
 ```
 #发布到服务器（prod环境名称）
 ./deploy.sh prod
@@ -135,7 +135,7 @@ $config['mysql']['password'] = "QC7BxCw0LejQzuI7";
 ```
 
 # mysql数据表
-[leaf_mysql.sql](https://git.weixin.qq.com/winixi/leaf/blob/master/leaf_mysql.sql)
+[leaf_mysql.sql](https://github.com/winixi/leaf/blob/dev/leaf_mysql.sql)
 ```
 --
 -- 表的结构 `s_task`
