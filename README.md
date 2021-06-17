@@ -43,6 +43,7 @@ $config['server']['port'] = 9502;
 #任务进程数
 $config['task']['worker_num'] = 3;
 $config['task']['class_path'] = "/Users/winixi/leaf/tasks";
+$config['task']['curl_timeout'] = 60;
 
 #redis
 $config['redis']['host'] = "127.0.0.1";
@@ -102,13 +103,18 @@ $config['mysql']['password'] = "QC7BxCw0LejQzuI7";
 
 # 定时任务接口操作
 ```
-#新增定时任务
-~ sudo curl -d '{"time":"* * 1 * * *","name":"MyTask","task_type":"FUN","memo":"test"}' -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/timer
+#新增定时执行任务
+~ sudo curl -d '{"time":"* * 1 * * *","name":"MyTask","task_type":"FUN","params":{"p1":1},"status":1,"memo":"test"}' -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/timer
+#返回 data值为定时唯一id，对应数据表s_time中记录的主键id
+{"code":0,"msg":"ok","data":1}
+
+#新增定时访问url任务
+~ sudo curl -d '{"time":"*/3 * * * * *","name":"http://localhost/test.php","task_type":"URL","params":{"p1":1},"status":1,"memo":"test"}' -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/timer
 #返回 data值为定时唯一id，对应数据表s_time中记录的主键id
 {"code":0,"msg":"ok","data":1}
 
 #修改定时任务
-~ sudo curl -d '{"time":"* * 1 * * *","name":"MyTask","task_type":"FUN","memo":"update"}' -H "Content-Type: application/json" -X "PUT" http://127.0.0.1:9502/timer/id/1
+~ sudo curl -d '{"time":"* * 1 * * *","name":"MyTask","task_type":"FUN","params":{"p1":10},"status":1,"memo":"update"}' -H "Content-Type: application/json" -X "PUT" http://127.0.0.1:9502/timer/id/1
 #返回
 {"code":0,"msg":"ok","data":true}
 
@@ -120,36 +126,36 @@ $config['mysql']['password'] = "QC7BxCw0LejQzuI7";
 #分页查看所有定时任务，包含已经结束不再执行的任务 (最大支持1024个定时任务)
 ~ sudo curl http://127.0.0.1:9502/timer/page?size=1&number=1
 #返回
-{"code":0,"msg":"ok","data":[{"id":"3","time":"* * 1 * * *","name":"MyTask","task_type":"FUN","count":"0","memo":"test","create_time":"2021-06-13 18:33:21","modify_time":null}]}
+{"code":0,"msg":"ok","data":[{"id":"3","time":"* * 1 * * *","name":"MyTask","task_type":"FUN","params":{"p1":10},"count":"0","memo":"test","create_time":"2021-06-13 18:33:21","modify_time":null}]}
 
 #查看指定定时任务详情，url参数指定id
 ~ sudo curl http://127.0.0.1:9502/timer/id/3
 #返回
-{"code":0,"msg":"ok","data":{"id":"3","time":"* * 1 * * *","name":"MyTask","task_type":"FUN","count":"0","memo":"test","create_time":"2021-06-13 18:33:21","modify_time":null}}
+{"code":0,"msg":"ok","data":{"id":"3","time":"* * 1 * * *","name":"MyTask","task_type":"FUN","params":{"p1":10},"count":"0","memo":"test","create_time":"2021-06-13 18:33:21","modify_time":null}}
 
 ```
 
 # 异步队列接口操作
 ```
 #新增一个本地执行的任务 (任务有两种: FUN/URL)
-~ sudo curl -d '{"name":"MyTask","task_type":"FUN"}'  -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/tasker
+~ sudo curl -d '{"name":"MyTask","task_type":"FUN","params":{"p1":10}}'  -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/tasker
 #返回当前队列高度
 {"code":0,"msg":"ok","data":"1"}
 
 #新增一个url请求任务 (向url post当前时间戳)
-~ sudo curl -d '{"name":"http://localhost/test_post.php","task_type":"URL"}'  -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/tasker
+~ sudo curl -d '{"name":"http://localhost/test_post.php","task_type":"URL","params":{"p1":10}}'  -H "Content-Type: application/json" -X "POST" http://127.0.0.1:9502/tasker
 #返回当前队列高度
 {"code":0,"msg":"ok","data":"1"}
 
 #分页查看历史任务
 ~ sudo curl http://127.0.0.1:9502/tasker/page?size=1&number=1
 #返回
-{"code":0,"msg":"ok","data":[{"id":"19","name":"MyTask","start":"1623549597.119","end":"1623549605.1193","duration":"8.000314950943","task_type":"FUN","result":"success","create_time":"2021-06-13 10:00:05"}]}
+{"code":0,"msg":"ok","data":[{"id":"19","name":"MyTask","start":"1623549597.119","end":"1623549605.1193","duration":"8.000314950943","task_type":"FUN","params":{"p1":10},"result":"success","create_time":"2021-06-13 10:00:05"}]}
 
 #查看指定id的任务
 ~ sudo curl http://127.0.0.1:9502/tasker/id/19
 #返回
-{"code":0,"msg":"ok","data":{"id":"19","name":"MyTask","start":"1623549597.119","end":"1623549605.1193","duration":"8.000314950943","task_type":"FUN","result":"success","create_time":"2021-06-13 10:00:05"}}
+{"code":0,"msg":"ok","data":{"id":"19","name":"MyTask","start":"1623549597.119","end":"1623549605.1193","duration":"8.000314950943","task_type":"FUN","params":{"p1":10},"result":"success","create_time":"2021-06-13 10:00:05"}}
 
 #查看当前队列长度
 ~ sudo curl http://127.0.0.1:9502/tasker/count
@@ -185,6 +191,7 @@ CREATE TABLE `s_time` (
   `name` varchar(256) COLLATE utf8mb4_bin NOT NULL COMMENT '名称，可能是一个url或一个class',
   `task_type` varchar(16) COLLATE utf8mb4_bin NOT NULL COMMENT '任务类型[FUN,URL]',
   `count` int(11) NOT NULL DEFAULT '0' COMMENT '已经执行次数',
+  `status` TINYINT NOT NULL DEFAULT '1' COMMENT '是否有效1有效0无效',
   `memo` text COLLATE utf8mb4_bin COMMENT '备注',
   `create_time` datetime NOT NULL COMMENT '创建时间',
   `modify_time` datetime DEFAULT NULL COMMENT '修改时间'
@@ -221,4 +228,5 @@ ALTER TABLE `s_time`
 ```
 
 # todo list
+接口参数检查
 集成mvc框架

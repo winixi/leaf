@@ -30,6 +30,7 @@ SET time_zone = "+00:00";
 CREATE TABLE `s_task` (
   `id` int(11) NOT NULL COMMENT '自增',
   `name` varchar(256) COLLATE utf8mb4_bin NOT NULL COMMENT '名称，可能是一个url或一个class',
+  `params` varchar(512) COLLATE utf8mb4_bin NOT NULL COMMENT '执行参数（数组的序列化）',
   `start` double NOT NULL COMMENT '开始时间',
   `end` double NOT NULL COMMENT '结束时间',
   `duration` double NOT NULL COMMENT '耗时秒数',
@@ -46,6 +47,7 @@ CREATE TABLE `s_time` (
   `id` int(11) NOT NULL COMMENT '自增',
   `time` varchar(64) COLLATE utf8mb4_bin NOT NULL COMMENT '定时设置',
   `name` varchar(256) COLLATE utf8mb4_bin NOT NULL COMMENT '名称，可能是一个url或一个class',
+  `params` varchar(512) COLLATE utf8mb4_bin NOT NULL COMMENT '执行参数（数组的序列化）',
   `task_type` varchar(16) COLLATE utf8mb4_bin NOT NULL COMMENT '任务类型[FUN,URL]',
   `count` int(11) NOT NULL DEFAULT '0' COMMENT '已经执行次数',
   `memo` text COLLATE utf8mb4_bin COMMENT '备注',

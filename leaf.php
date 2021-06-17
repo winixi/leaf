@@ -13,12 +13,11 @@ $table = new Swoole\Table(1024);
 $table->column('id', Swoole\Table::TYPE_INT);
 $table->column('time', Swoole\Table::TYPE_STRING, 64);
 $table->column('name', Swoole\Table::TYPE_STRING, 256);
+$table->column('params', Swoole\Table::TYPE_STRING, 512);
 $table->column('task_type', Swoole\Table::TYPE_STRING, 64);
 $table->create();
 
-//时间id数组
-$timeIds = [];
-
+#子进程文件
 $spid = fopen("process.spid", "w") or die("不能创建子进程文件");
 
 #开启任务队列服务
@@ -31,22 +30,22 @@ $taskerProcess->start();
 fwrite($spid, $taskerProcess->pid);
 
 #开启定时任务服务
-$timerProcess = new swoole_process(function (swoole_process $timerProcess) use ($config, $table, $timeIds) {
-    $timerServer = new TimerServer($config, $table, $timeIds);
+$timerProcess = new swoole_process(function (swoole_process $timerProcess) use ($config, $table) {
+    $timerServer = new TimerServer($config, $table);
     $timerServer->start();
     $timerProcess->exit(0);
 }, false, 0);
 $timerProcess->start();
-fwrite($spid, " ".$timerProcess->pid);
+fwrite($spid, " " . $timerProcess->pid);
 
 #开启接口服务
-$apiProcess = new swoole_process(function (swoole_process $apiProcess) use ($config, $table, $timeIds) {
-    $apiServer = new ApiServer($config, $table, $timeIds);
+$apiProcess = new swoole_process(function (swoole_process $apiProcess) use ($config, $table) {
+    $apiServer = new ApiServer($config, $table);
     $apiServer->start();
     $apiProcess->exit(0);
 }, false, 0);
 $apiProcess->start();
-fwrite($spid, " ".$apiProcess->pid);
+fwrite($spid, " " . $apiProcess->pid);
 fclose($spid);
 
 echo "LEAF服务启动完成.\n";

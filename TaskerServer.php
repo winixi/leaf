@@ -121,7 +121,7 @@ class TaskerServer
         }
         require_once $className;
         $startTime = microtime_float();
-        $result = (new $name)->run();
+        $result = (new $name)->run(json_decode($task['params'],true));
         //记录到数据库
         $this->save($task, $startTime, $result, $dbh);
     }
@@ -137,10 +137,11 @@ class TaskerServer
     private function save(array $task, float $startTime, string $result, PDO $dbh)
     {
         $endTime = microtime_float();
-        $sql = "INSERT INTO s_task (name, start, end, duration, task_type, result, create_time) values (:name, :start, :end, :duration, :task_type, :result, :create_time)";
+        $sql = "INSERT INTO s_task (name,start,end,duration,task_type,params,result,create_time) values (:name,:start,:end,:duration,:task_type,:params,:result,:create_time)";
         $sth = $dbh->prepare($sql);
 
         $values[":name"] = $task['name'];
+        $values[":params"] = json_encode($task['params'], true);
         $values[":start"] = $startTime;
         $values[":end"] = $endTime;
         $values[":duration"] = $endTime - $startTime;
@@ -159,13 +160,15 @@ class TaskerServer
      */
     private function runUrl(array $task, PDO $dbh)
     {
+        $params = json_decode($task['params'], true);
         $startTime = microtime_float();
-        $url = $task['name'];
-        $ch = curl_init($url);
 
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $task['name']);
         curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, array("timestamp" => microtime_float()));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($params, null, '&'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->config['task']['curl_timeout']);
 
         $result = curl_exec($ch);
         curl_close($ch);

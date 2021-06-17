@@ -17,6 +17,7 @@ $config['server']['port'] = 9502;
 #任务进程数
 $config['task']['worker_num'] = 3;
 $config['task']['class_path'] = "/Users/winixi/github/leaf/tasks";
+$config['task']['curl_timeout'] = 60;
 
 #redis
 $config['redis']['host'] = "127.0.0.1";

@@ -20,11 +20,6 @@ class TimerClient
     /* @var \Swoole\Table */
     private $table;
 
-    /**
-     * @var array
-     */
-    private $timeIds;
-
     /* @var PDO */
     private $dbh;
 
@@ -33,13 +28,11 @@ class TimerClient
      *
      * @param array $config
      * @param \Swoole\Table $table
-     * @param array $timeIds
      */
-    public function __construct(array $config, \Swoole\Table $table, array $timeIds)
+    public function __construct(array $config, \Swoole\Table $table)
     {
         $this->config = $config;
         $this->table = $table;
-        $this->timeIds = $timeIds;
     }
 
     /**
@@ -89,20 +82,23 @@ class TimerClient
      */
     private function add(\Swoole\Http\Request $req, \Swoole\Http\Response $resp)
     {
-        $dbh = $this->getDbh();
-        $sql = 'INSERT INTO s_time (time,name,task_type,memo,create_time) VALUES (:time,:name,:task_type,:memo,:create_time)';
-        $sth = $dbh->prepare($sql);
         $timer = json_decode($req->getContent(), true);
+        //todo 参数校验
+
+        $dbh = $this->getDbh();
+        $sql = 'INSERT INTO s_time (time,name,params,task_type,status,memo,create_time) VALUES (:time,:name,:params,:task_type,:status,:memo,:create_time)';
+        $sth = $dbh->prepare($sql);
         $values[':time'] = $timer['time'];
         $values[':name'] = $timer['name'];
+        $values[':status'] = $timer['status'];
+        $values[':params'] = json_encode($timer['params'], true);
         $values[':task_type'] = $timer['task_type'];
         $values[':memo'] = $timer['memo'];
         $values[':create_time'] = date('Y-m-d H:i:s');
         $sth->execute($values);
 
         $id = $dbh->lastInsertId();
-        $this->timeIds[] = $id;
-        $this->table->set($id, array('id' => $id, 'time' => $timer['time'], 'name' => $timer['name'], 'task_type' => $timer['task_type']));
+        if ($timer['status'] == 1) $this->_add($id, $timer);
 
         add_header($resp);
         $resp->end(new Response($id));
@@ -118,7 +114,6 @@ class TimerClient
     {
         $uri = $req->server["request_uri"];
         $dbh = $this->getDbh();
-        $result = "";
 
         //历史记录
         if ($uri == "/timer/page") {
@@ -129,14 +124,18 @@ class TimerClient
             $sth->bindParam(1, $offset, PDO::PARAM_INT);
             $sth->bindParam(2, $size, PDO::PARAM_INT);
             $sth->execute();
-            $result = $sth->fetchAll(PDO::FETCH_ASSOC);
-        }
-        //指定记录
+            foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $row['params'] = json_decode($row['params'], true);
+                $result[] = $row;
+            }
+        } //指定记录
         elseif (strpos($uri, "/timer/id/") === 0) {
             $id = str_replace("/timer/id/", "", $uri);
             $sth = $dbh->prepare("SELECT * FROM s_time WHERE id=?");
             $sth->execute(array($id));
-            $result = $sth->fetch(PDO::FETCH_ASSOC);
+            $row = $sth->fetch(PDO::FETCH_ASSOC);
+            $row['params'] = json_decode($row['params'], true);
+            $result = $row;
         }
 
         add_header($resp);
@@ -155,19 +154,25 @@ class TimerClient
         $uri = $req->server['request_uri'];
         if (strpos($uri, '/timer/id/') === 0) {
             $id = str_replace('/timer/id/', '', $uri);
-            $sql = 'UPDATE s_time SET time=:time,name=:name,task_type=:task_type,memo=:memo,modify_time=:modify_time WHERE id=:id';
+            $sql = 'UPDATE s_time SET time=:time,name=:name,params=:params,task_type=:task_type,status=:status,memo=:memo,modify_time=:modify_time WHERE id=:id';
             $sth = $dbh->prepare($sql);
 
             $timer = json_decode($req->getContent(), true);
             $values[':id'] = $id;
             $values[':time'] = $timer['time'];
             $values[':name'] = $timer['name'];
+            $values[':params'] = json_encode($timer['params'], true);
             $values[':task_type'] = $timer['task_type'];
+            $values[':status'] = $timer['status'];
             $values[':memo'] = $timer['memo'];
             $values[':modify_time'] = date('Y-m-d H:i:s');
             $sth->execute($values);
 
-            $this->table->set($id, array('id' => $id, 'time' => $timer['time'], 'name' => $timer['name'], 'task_type' => $timer['task_type']));
+            //增加
+            if ($timer['status'] == 1) $this->_add($id, $timer);
+
+            //删除
+            if ($timer['status'] == 0) $this->_del($id);
 
             add_header($resp);
             $resp->end(new Response(true));
@@ -190,11 +195,32 @@ class TimerClient
             $sth->execute(array($id));
 
             #存在就删除，防止是历史已经不再执行的任务
-            if ($this->table->exist($id)) $this->table->del($id);
-            if (($key = array_search($id, $this->timeIds))) unset($this->timeIds[$key]);
+            $this->_del($id);
 
             add_header($resp);
             $resp->end(new Response(true));
         }
+    }
+
+    /**
+     * 添加
+     *
+     * @param int $id
+     * @param array $timer
+     */
+    private function _add(int $id, array $timer)
+    {
+        $values = array('id' => $id, 'time' => $timer['time'], 'name' => $timer['name'], 'task_type' => $timer['task_type'], 'params' => json_encode($timer['params'], true));
+        $this->table->set($id, $values);
+    }
+
+    /**
+     * 从内存中删除
+     *
+     * @param int $id
+     */
+    private function _del(int $id)
+    {
+        if ($this->table->exist($id)) $this->table->del($id);
     }
 }

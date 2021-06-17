@@ -44,6 +44,7 @@ class TaskerClient
     private function add(\Swoole\Http\Request $req, \Swoole\Http\Response $resp)
     {
         $task = $req->getContent();
+        //todo 对内容进行验证
         $result = $this->addTask($task);
 
         add_header($resp);
@@ -75,7 +76,6 @@ class TaskerClient
         $uri = $req->server["request_uri"];
         $redis = $this->getRedis();
         $dbh = $this->getDbh();
-        $result = "";
 
         //队列条数
         if ($uri == "/tasker/count") {
@@ -91,14 +91,19 @@ class TaskerClient
             $sth->bindParam(1, $offset, PDO::PARAM_INT);
             $sth->bindParam(2, $size, PDO::PARAM_INT);
             $sth->execute();
-            $result = $sth->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $row['params'] = json_decode($row['params'], true);
+                $result[] = $row;
+            }
         }
         //指定记录
         elseif (strpos($uri, "/tasker/id/") === 0) {
             $id = str_replace("/tasker/id/", "", $uri);
             $sth = $dbh->prepare("SELECT * FROM s_task WHERE id=?");
             $sth->execute(array($id));
-            $result = $sth->fetch(PDO::FETCH_ASSOC);
+            $row = $sth->fetch(PDO::FETCH_ASSOC);
+            $row['params'] = json_decode($row['params'], true);
+            $result = $row;
         }
 
         add_header($resp);

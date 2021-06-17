@@ -26,11 +26,6 @@ class TimerServer
     private $table;
 
     /**
-     * @var array
-     */
-    private $timeIds;
-
-    /**
      * @var PDO
      */
     private $dbh;
@@ -42,13 +37,11 @@ class TimerServer
      * TimerServer constructor.
      * @param array $config
      * @param \Swoole\Table $table
-     * @param array $timeIds
      */
-    public function __construct(array $config, \Swoole\Table $table, array $timeIds)
+    public function __construct(array $config, \Swoole\Table $table)
     {
         $this->config = $config;
         $this->table = $table;
-        $this->timeIds = $timeIds;
         $this->loadDb();
         $this->taskClient = new TaskerClient($config);
     }
@@ -73,14 +66,13 @@ class TimerServer
     private function loadDb()
     {
         $dbh = $this->getDbh();
-        $sth = $dbh->query("SELECT * FROM s_time");
+        $sth = $dbh->query("SELECT * FROM s_time WHERE status=1");
         foreach ($sth->fetchAll(PDO::FETCH_ASSOC) as $row) {
             $id = $row["id"];
-            $record = array('id' => $id, 'time' => $row['time'], 'name' => $row['name'], 'task_type' => $row['task_type']);
+            $record = array('id' => $id, 'time' => $row['time'], 'name' => $row['name'], 'task_type' => $row['task_type'], 'params' => $row['params']);
             $this->table->set($id, $record);
-            $this->timeIds[] = $id;
         }
-        Logger::info("从数据库中加载了" . sizeof($this->timeIds) . "条定时任务");
+        Logger::info("从数据库中加载了" . $this->table->count() . "条定时任务");
     }
 
     /**
@@ -107,11 +99,9 @@ class TimerServer
     public function run($ticket_id)
     {
         $now = time();
-        foreach ($this->timeIds as $id) {
-            if (($time = $this->table->get($id))) {
-                if (Crontab::parseCron($time['time'], $now)) {
-                    $this->addTask($time);
-                }
+        foreach ($this->table as $time) {
+            if (Crontab::parseCron($time['time'], $now)) {
+                $this->addTask($time);
             }
         }
     }
@@ -125,9 +115,8 @@ class TimerServer
     private function addTask(array $time)
     {
         //加入到执行任务队列
-        $task = json_encode(array('name' => $time['name'], 'task_type' => $time['task_type']), true);
+        $task = json_encode(array('name' => $time['name'], 'task_type' => $time['task_type'], 'params' => $time['params']), true);
         $this->taskClient->addTask($task);
-
         Logger::info("添加一条执行任务:" . $task);
 
         //本地累计一次

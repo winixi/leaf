@@ -25,14 +25,14 @@ class ApiServer
 
     /**
      * ApiServer constructor.
+     *
      * @param array $config
      * @param \Swoole\Table $table
-     * @param array $timeIds
      */
-    public function __construct(array $config, \Swoole\Table $table, array $timeIds)
+    public function __construct(array $config, \Swoole\Table $table)
     {
         $this->config = $config;
-        $this->timerClient = new TimerClient($config, $table, $timeIds);;
+        $this->timerClient = new TimerClient($config, $table);;
         $this->taskClient = new TaskerClient($config);
     }
 
