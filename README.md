@@ -177,6 +177,7 @@ CREATE TABLE `s_task` (
   `end` double NOT NULL COMMENT '结束时间',
   `duration` double NOT NULL COMMENT '耗时秒数',
   `task_type` varchar(16) COLLATE utf8mb4_bin NOT NULL COMMENT '任务类型[FUN,URL]',
+  `params` varchar(512) COLLATE utf8mb4_bin NOT NULL COMMENT 'json参数',
   `result` text COLLATE utf8mb4_bin NOT NULL COMMENT '执行结果',
   `create_time` datetime NOT NULL COMMENT '创建时间'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='任务执行结果表';
@@ -190,6 +191,7 @@ CREATE TABLE `s_time` (
   `time` varchar(64) COLLATE utf8mb4_bin NOT NULL COMMENT '定时设置',
   `name` varchar(256) COLLATE utf8mb4_bin NOT NULL COMMENT '名称，可能是一个url或一个class',
   `task_type` varchar(16) COLLATE utf8mb4_bin NOT NULL COMMENT '任务类型[FUN,URL]',
+  `params` varchar(512) COLLATE utf8mb4_bin NOT NULL COMMENT 'json参数',
   `count` int(11) NOT NULL DEFAULT '0' COMMENT '已经执行次数',
   `status` TINYINT NOT NULL DEFAULT '1' COMMENT '是否有效1有效0无效',
   `memo` text COLLATE utf8mb4_bin COMMENT '备注',
